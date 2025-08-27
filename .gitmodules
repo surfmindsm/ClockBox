@@ -1,0 +1,9 @@
+[submodule "backend"]
+	path = backend
+	url = https://github.com/surfmindsm/clockbox-backend.git
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/surfmindsm/clockbox-frontend.git
+[submodule "app"]
+	path = app
+	url = https://github.com/surfmindsm/clockbox-app.git
