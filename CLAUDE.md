@@ -67,6 +67,16 @@ The project is in the **planning/documentation phase**. The submodules are initi
 4. Implement proper audit logging for compliance
 5. Support both Korean and English languages from the start
 
+### Task Tracking Requirements:
+**IMPORTANT**: Always update `docs/tasks/remaining_tasks.md` when working on tasks:
+- Mark tasks as completed when finished
+- Update progress percentages for each category
+- Add any new tasks discovered during development
+- Update the "다음 스프린트" section with current priorities
+- Keep the total task count and completion rate accurate
+
+This ensures transparency and helps track overall project progress.
+
 ### Technology Stack Decisions Pending
 The specific frameworks and languages for each component have not been decided. When making technology choices, consider:
 - **Mobile app**: Cross-platform support (iOS/Android)
