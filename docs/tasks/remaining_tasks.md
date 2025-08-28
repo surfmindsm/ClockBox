@@ -69,13 +69,13 @@
 - [x] `screens/Leave/LeaveRequestScreen.tsx` - 휴가 신청 ✅ (2024-12-29)
 
 #### 서비스 구현
-- [ ] `services/biometric.ts` - 생체인증
-- [ ] `services/location.ts` - 위치 서비스
-- [ ] `services/notification.ts` - 푸시 알림
+- [x] `services/biometric.ts` - 생체인증 ✅ (2024-12-29)
+- [x] `services/location.ts` - 위치 서비스 ✅ (2024-12-29)
+- [x] `services/notification.ts` - 푸시 알림 ✅ (2024-12-29)
 
 #### 네비게이션
 - [x] `navigation/AppNavigator.tsx` - 앱 네비게이터 ✅ (2024-12-29)
-- [ ] `navigation/AuthNavigator.tsx` - 인증 네비게이터
+- [x] `navigation/AuthNavigator.tsx` - 인증 네비게이터 ✅ (2024-12-29)
 
 ### 2.3 Backend (Supabase Edge Functions)
 
@@ -208,14 +208,14 @@
 | 52시간 근무제 | 4 | 4 | 100% |
 | Supabase 설정 | 5 | 5 | 100% |
 | Frontend 개발 | 25 | 20 | 80% |
-| Mobile 개발 | 13 | 7 | 54% |
+| Mobile 개발 | 13 | 12 | 92% |
 | Backend Functions | 7 | 5 | 71% |
 | 외부 서비스 | 13 | 0 | 0% |
 | 테스트 | 10 | 3 | 30% |
 | UI/UX | 10 | 0 | 0% |
 | 인프라 | 9 | 0 | 0% |
 | 문서화 | 8 | 5 | 63% |
-| **전체** | **104** | **49** | **47%** |
+| **전체** | **104** | **54** | **52%** |
 
 ---
 
@@ -254,7 +254,7 @@
 
 ---
 
-*마지막 업데이트: 2024-12-29 (진행률 47% 달성)*
+*마지막 업데이트: 2024-12-29 (진행률 52% 달성 - 50% 돌파!)*
 
 ## 📌 최근 완료 작업 (2024-12-29)
 ### 52시간 근무제 완성
@@ -280,6 +280,10 @@
 - ✅ 출퇴근 이력 화면 구현 (AttendanceHistory)
 - ✅ 휴가 신청 화면 구현 (LeaveRequestScreen)
 - ✅ 앱 네비게이터 구현 (Tab/Stack 네비게이션)
+- ✅ 인증 네비게이터 구현 (AuthNavigator)
+- ✅ 생체인증 서비스 구현 (biometric.ts)
+- ✅ 위치 서비스 구현 (location.ts)
+- ✅ 푸시 알림 서비스 구현 (notification.ts)
 
 ## 📌 이전 완료 작업 (2024-12-28)
 ### 인프라 설정
@@ -311,9 +315,9 @@
 - ✅ send-kakao-notification 함수 구현 (카카오톡 알림톡)
 
 ### 진행률
-- 전체 진행률: 27% → 47% (20% 상승)
+- 전체 진행률: 27% → 52% (25% 상승) - **50% 돌파!**
 - Frontend 개발: 56% → 80% (24% 상승)
-- Mobile 개발: 8% → 54% (46% 상승)
+- Mobile 개발: 8% → 92% (84% 상승) - **거의 완료!**
 - Backend Functions: 33% → 71% (38% 상승)
 - 테스트: 0% → 30% (30% 상승)
 - 52시간 근무제: 0% → 100% (100% 완료)
