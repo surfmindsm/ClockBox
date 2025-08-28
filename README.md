@@ -1,129 +1,183 @@
-# ClockBox - 통합 근태·인력관리 시스템
+# Supabase CLI
 
-한국 시장에 최적화된 종합 근태관리 SaaS 솔루션
+[![Coverage Status](https://coveralls.io/repos/github/supabase/cli/badge.svg?branch=main)](https://coveralls.io/github/supabase/cli?branch=main) [![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/supabase-cli/setup-cli/master?style=flat-square&label=Bitbucket%20Canary)](https://bitbucket.org/supabase-cli/setup-cli/pipelines) [![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/sweatybridge%2Fsetup-cli?label=Gitlab%20Canary)
+](https://gitlab.com/sweatybridge/setup-cli/-/pipelines)
 
-## 🚀 프로젝트 구조
+[Supabase](https://supabase.io) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
 
-```
-ClockBox/
-├── backend/        # Supabase 백엔드
-├── frontend/       # Next.js 웹 애플리케이션  
-├── app/           # React Native 모바일 앱
-└── docs/          # 프로젝트 문서 및 PRD
-```
+This repository contains all the functionality for Supabase CLI.
 
-## 🛠 기술 스택
+- [x] Running Supabase locally
+- [x] Managing database migrations
+- [x] Creating and deploying Supabase Functions
+- [x] Generating types directly from your database schema
+- [x] Making authenticated HTTP requests to [Management API](https://supabase.com/docs/reference/api/introduction)
 
-- **Backend**: Supabase (PostgreSQL, Auth, Realtime, Edge Functions)
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
-- **Mobile**: React Native (Expo), TypeScript
-- **Infrastructure**: Vercel, Supabase Cloud
+## Getting started
 
-## 📋 주요 기능
+### Install the CLI
 
-### 핵심 기능
-- ✅ 52시간 근무제 자동 차단 및 모니터링
-- ✅ GPS/WiFi 기반 출퇴근 인증
-- ✅ 실시간 근태 현황 대시보드
-- ✅ 다단계 휴가 승인 워크플로우
-- ✅ 한국형 급여 계산 (연장/야간/휴일 수당)
-
-### 한국 시장 특화
-- 📱 카카오톡 알림톡 연동
-- 💼 더존/영림원/SAP 연동
-- 📊 법정 리포트 자동 생성
-- 🔐 개인정보보호법 준수
-
-## 🚀 시작하기
-
-### 1. Backend (Supabase) 설정
+Available via [NPM](https://www.npmjs.com) as dev dependency. To install:
 
 ```bash
-cd backend
-
-# Supabase CLI 로그인
-npx supabase login
-
-# 로컬 개발 서버 시작
-npx supabase start
-
-# 데이터베이스 마이그레이션
-npx supabase db push
-
-# Edge Functions 배포
-npx supabase functions deploy
+npm i supabase --save-dev
 ```
 
-### 2. Frontend (Next.js) 실행
+To install the beta release channel:
 
 ```bash
-cd frontend
-
-# 의존성 설치
-npm install
-
-# 환경변수 설정 (.env.local)
-cp .env.local.example .env.local
-
-# 개발 서버 시작
-npm run dev
+npm i supabase@beta --save-dev
 ```
 
-### 3. Mobile App (React Native) 실행
+When installing with yarn 4, you need to disable experimental fetch with the following nodejs config.
+
+```
+NODE_OPTIONS=--no-experimental-fetch yarn add supabase
+```
+
+> **Note**
+For Bun versions below v1.0.17, you must add `supabase` as a [trusted dependency](https://bun.sh/guides/install/trusted) before running `bun add -D supabase`.
+
+<details>
+  <summary><b>macOS</b></summary>
+
+  Available via [Homebrew](https://brew.sh). To install:
+
+  ```sh
+  brew install supabase/tap/supabase
+  ```
+
+  To install the beta release channel:
+  
+  ```sh
+  brew install supabase/tap/supabase-beta
+  brew link --overwrite supabase-beta
+  ```
+  
+  To upgrade:
+
+  ```sh
+  brew upgrade supabase
+  ```
+</details>
+
+<details>
+  <summary><b>Windows</b></summary>
+
+  Available via [Scoop](https://scoop.sh). To install:
+
+  ```powershell
+  scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+  scoop install supabase
+  ```
+
+  To upgrade:
+
+  ```powershell
+  scoop update supabase
+  ```
+</details>
+
+<details>
+  <summary><b>Linux</b></summary>
+
+  Available via [Homebrew](https://brew.sh) and Linux packages.
+
+  #### via Homebrew
+
+  To install:
+
+  ```sh
+  brew install supabase/tap/supabase
+  ```
+
+  To upgrade:
+
+  ```sh
+  brew upgrade supabase
+  ```
+
+  #### via Linux packages
+
+  Linux packages are provided in [Releases](https://github.com/supabase/cli/releases). To install, download the `.apk`/`.deb`/`.rpm`/`.pkg.tar.zst` file depending on your package manager and run the respective commands.
+
+  ```sh
+  sudo apk add --allow-untrusted <...>.apk
+  ```
+
+  ```sh
+  sudo dpkg -i <...>.deb
+  ```
+
+  ```sh
+  sudo rpm -i <...>.rpm
+  ```
+
+  ```sh
+  sudo pacman -U <...>.pkg.tar.zst
+  ```
+</details>
+
+<details>
+  <summary><b>Other Platforms</b></summary>
+
+  You can also install the CLI via [go modules](https://go.dev/ref/mod#go-install) without the help of package managers.
+
+  ```sh
+  go install github.com/supabase/cli@latest
+  ```
+
+  Add a symlink to the binary in `$PATH` for easier access:
+
+  ```sh
+  ln -s "$(go env GOPATH)/bin/cli" /usr/bin/supabase
+  ```
+
+  This works on other non-standard Linux distros.
+</details>
+
+<details>
+  <summary><b>Community Maintained Packages</b></summary>
+
+  Available via [pkgx](https://pkgx.sh/). Package script [here](https://github.com/pkgxdev/pantry/blob/main/projects/supabase.com/cli/package.yml).
+  To install in your working directory:
+
+  ```bash
+  pkgx install supabase
+  ```
+
+  Available via [Nixpkgs](https://nixos.org/). Package script [here](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/tools/supabase-cli/default.nix).
+</details>
+
+### Run the CLI
 
 ```bash
-cd app
-
-# 의존성 설치
-npm install
-
-# iOS 실행
-npm run ios
-
-# Android 실행
-npm run android
+supabase bootstrap
 ```
 
-## 📦 환경 변수 설정
+Or using npx:
 
-### Frontend (.env.local)
-```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```bash
+npx supabase bootstrap
 ```
 
-### Mobile App (.env)
+The bootstrap command will guide you through the process of setting up a Supabase project using one of the [starter](https://github.com/supabase-community/supabase-samples/blob/main/samples.json) templates.
+
+## Docs
+
+Command & config reference can be found [here](https://supabase.com/docs/reference/cli/about).
+
+## Breaking changes
+
+We follow semantic versioning for changes that directly impact CLI commands, flags, and configurations.
+
+However, due to dependencies on other service images, we cannot guarantee that schema migrations, seed.sql, and generated types will always work for the same CLI major version. If you need such guarantees, we encourage you to pin a specific version of CLI in package.json.
+
+## Developing
+
+To run from source:
+
+```sh
+# Go >= 1.22
+go run . help
 ```
-EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-## 📚 프로젝트 문서
-
-- [기능명세서](docs/functional_specification.md)
-- [메인 PRD](docs/prd/main_prd_main.md)
-- [한국 시장 분석](docs/PRD심층분석.md)
-
-## 🔐 보안 및 컴플라이언스
-
-- 52시간 근무제 실시간 모니터링
-- 개인정보보호법 준수 (3년 데이터 보관)
-- Row Level Security (RLS) 적용
-- End-to-End 암호화
-
-## 📱 지원 플랫폼
-
-- Web: Chrome, Firefox, Safari, Edge (최신 2버전)
-- iOS: 14.0+
-- Android: 8.0+ (API Level 26+)
-
-## 🤝 기여하기
-
-프로젝트 기여는 다음 git submodule 저장소에서 가능합니다:
-- Backend: https://github.com/surfmindsm/clockbox-backend
-- Frontend: https://github.com/surfmindsm/clockbox-frontend  
-- App: https://github.com/surfmindsm/clockbox-app
-
-## 📄 라이선스
-
-Copyright © 2024 Surfmind. All rights reserved.
