@@ -83,7 +83,7 @@
 - [x] `functions/clock-out/` - 퇴근 처리 ✅ (2024-12-29)
 - [x] `functions/approve-leave/` - 휴가 승인 ✅ (2024-12-29)
 - [x] `functions/calculate-weekly-hours/` - 주간 근무시간 계산 ✅ (2024-12-29)
-- [ ] `functions/send-kakao-notification/` - 카카오톡 알림
+- [x] `functions/send-kakao-notification/` - 카카오톡 알림 ✅ (2024-12-29)
 - [ ] `functions/sync-douzone/` - 더존 연동
 - [ ] `functions/generate-report/` - 리포트 생성
 
@@ -207,13 +207,13 @@
 | Supabase 설정 | 5 | 5 | 100% |
 | Frontend 개발 | 25 | 20 | 80% |
 | Mobile 개발 | 13 | 4 | 31% |
-| Backend Functions | 7 | 4 | 57% |
+| Backend Functions | 7 | 5 | 71% |
 | 외부 서비스 | 13 | 0 | 0% |
 | 테스트 | 10 | 1 | 10% |
 | UI/UX | 10 | 0 | 0% |
 | 인프라 | 9 | 0 | 0% |
 | 문서화 | 8 | 5 | 63% |
-| **전체** | **104** | **43** | **41%** |
+| **전체** | **104** | **44** | **42%** |
 
 ---
 
@@ -300,10 +300,11 @@
 - ✅ clock-out 함수 구현 (퇴근 처리)
 - ✅ approve-leave 함수 구현 (휴가 승인)
 - ✅ calculate-weekly-hours 함수 구현 (주간 근무시간 계산)
+- ✅ send-kakao-notification 함수 구현 (카카오톡 알림톡)
 
 ### 진행률
-- 전체 진행률: 27% → 41% (14% 상승)
+- 전체 진행률: 27% → 42% (15% 상승)
 - Frontend 개발: 56% → 80% (24% 상승)
 - Mobile 개발: 8% → 31% (23% 상승)
-- Backend Functions: 33% → 57% (24% 상승)
+- Backend Functions: 33% → 71% (38% 상승)
 - 52시간 근무제: 0% → 100% (100% 완료)
