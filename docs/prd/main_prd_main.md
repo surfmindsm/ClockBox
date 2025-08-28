@@ -365,6 +365,36 @@ GET    /api/reports/overtime      # 초과근무 통계
 GET    /api/reports/leave         # 휴가 사용 현황
 ```
 
+### 🇰🇷 7.6 한국 로컬 ERP 연동 API
+#### 더존 SmartA 연동
+```
+POST   /api/integrations/douzone/sync     # 더존 데이터 동기화
+GET    /api/integrations/douzone/status   # 연동 상태 확인
+POST   /api/integrations/douzone/payroll  # 급여 데이터 전송 (Excel 기반)
+```
+
+#### 영림원 소프트랩 (K-System) 연동  
+```
+POST   /api/integrations/youngrimwon/mes-sync    # MES 시스템 연동
+GET    /api/integrations/youngrimwon/work-orders # 작업지시서 연동
+POST   /api/integrations/youngrimwon/attendance  # 제조업 출근 데이터 전송
+```
+
+#### SAP Korea HCM 연동
+```
+POST   /api/integrations/sap/employee-master     # 인사마스터 동기화
+POST   /api/integrations/sap/time-management     # 근태관리 연동 (미들웨어 필수)
+GET    /api/integrations/sap/payroll-results     # 급여 결과 조회
+```
+
+### 🔐 7.7 보안 및 인증 API (한국 표준)
+```
+POST   /api/security/kisa-verify      # KISA 보안 인증 검증
+POST   /api/security/cpo-report       # 개인정보보호 최고책임자(CPO) 보고
+GET    /api/security/gs-certification # GS(Good Software) 인증 상태
+POST   /api/security/audit-log        # 감사 로그 생성 (3년 보관)
+```
+
 ## 8. 화면 구성 및 사용자 플로우
 
 ### 8.1 주요 화면 구성
@@ -395,7 +425,29 @@ GET    /api/reports/leave         # 휴가 사용 현황
 - 고객 유지율 > 90% (연간)
 - ARPU (Average Revenue Per User)
 - NPS (Net Promoter Score) > 50
-- 사용자 만족도 > 4.5/5  
+- 사용자 만족도 > 4.5/5
+
+### 💰 9.3 ROI 및 경제성 지표
+#### 중소기업 대상 (50명 이하)
+- **급여처리 시간**: 84% 단축 (6분 → 1분/명)  
+- **근무시간 도용 방지**: 주당 4시간/직원 절약 (연 208시간)
+- **52시간 위반 벌금**: 최대 2천만원 회피 
+- **HR 담당자 업무량**: 40% 감소
+- **투자 회수**: **12개월 내 완전 회수 보장**
+- **월간 절감액**: 인건비 300만원 + 벌금 리스크 제거
+
+#### 대기업 대상 (500명 이상) 
+- **급여처리 자동화**: 월 120시간 → 20시간 (83% 단축)
+- **컴플라이언스 리스크**: 연 10억원 벌금 위험 제거
+- **관리 효율성**: HR팀 업무시간 50% 단축 
+- **투자 회수**: **24-36개월 계획적 회수**
+- **연간 절감액**: 인건비 2억원 + 리스크 관리 비용 절약
+
+### 💸 9.4 정부 지원사업 연계 혜택
+- **유연근무제 인프라 구축 지원**: 최대 2천만원
+- **중소기업 디지털 전환 바우처**: 최대 5천만원  
+- **고용노동부 일자리 창출 인증**: 세제 혜택 연계
+- **근로환경 개선 지원금**: 최대 3천만원  
 
 ---
 
