@@ -193,7 +193,6 @@
 ## 6️⃣ 인프라 및 배포 (Priority: Low)
 
 ### 6.1 CI/CD 파이프라인
-- [ ] GitHub Actions 워크플로우 설정
 - [ ] 자동 테스트 실행
 - [ ] Vercel 자동 배포
 - [ ] Expo EAS Build 설정
@@ -268,7 +267,6 @@
    - API 응답 시간 개선
    
 2. **배포 준비**
-   - CI/CD 파이프라인 구성 (GitHub Actions)
    - 보안 강화 (Security Headers, Rate Limiting)
    - 프로덕션 모니터링 설정 (Sentry, Analytics)
 
