@@ -1,0 +1,657 @@
+openapi: 3.0.3
+info:
+  title: ClockBox Workforce Management API
+  description: |
+    ClockBox is a comprehensive workforce and attendance management system designed specifically for the Korean market.
+    
+    ## Features
+    - ✅ **52-hour workweek compliance**: Real-time monitoring and automatic blocking
+    - ✅ **Korean labor law compliance**: 2025 law updates support
+    - ✅ **Multi-platform**: Web, Mobile (iOS/Android)
+    - ✅ **Real-time tracking**: GPS/WiFi-based attendance verification
+    - ✅ **Enterprise integrations**: KakaoTalk, 더존 SmartA, SAP Korea HCM
+    
+    ## Authentication
+    All API endpoints use Bearer token authentication via Supabase Auth.
+    
+    ## Rate Limiting
+    - API routes: 1000 requests/minute per IP
+    - Auth routes: 10 requests/minute per IP
+    
+    ## Korean Market Compliance
+    This API is designed to meet Korean labor regulations including:
+    - 근로기준법 (Labor Standards Act)
+    - 52시간 근무제 (52-hour workweek)
+    - 개인정보보호법 (Personal Information Protection Act)
+  version: 1.0.0
+  contact:
+    name: ClockBox API Support
+    email: support@clockbox.app
+  license:
+    name: Proprietary
+servers:
+  - url: https://apmgoboqnodhroqvetjx.supabase.co/functions/v1
+    description: Production server
+  - url: http://localhost:54321/functions/v1
+    description: Development server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /clock-in:
+    post:
+      summary: Clock In Employee
+      description: |
+        Records employee clock-in with location verification and 52-hour workweek compliance check.
+        
+        **52시간 근무제 Compliance**: 
+        - Automatically blocks clock-in if employee has worked 52+ hours this week
+        - Sends warning notifications at 48 and 50 hours
+        
+        **Location Verification**: 
+        - Validates GPS coordinates against registered work locations
+        - Supports multiple work sites per organization
+      operationId: clockIn
+      tags:
+        - Attendance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - location
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: Employee's user ID
+                location:
+                  $ref: '#/components/schemas/Location'
+                force_override:
+                  type: boolean
+                  default: false
+                  description: Admin override for 52-hour limit (requires admin role)
+              example:
+                user_id: "123e4567-e89b-12d3-a456-426614174000"
+                location:
+                  lat: 37.5665
+                  lng: 126.9780
+                  accuracy: 5
+      responses:
+        '200':
+          description: Successfully clocked in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/AttendanceRecord'
+                  weekly_hours:
+                    type: number
+                    description: Current weekly hours worked
+                  status:
+                    type: string
+                    enum: [normal, warning, critical]
+                    description: 52-hour workweek status
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          description: Clock-in blocked (52-hour limit reached)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "52시간 근무제한 초과로 출근이 차단되었습니다"
+                  weekly_hours:
+                    type: number
+                  blocked_until:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /clock-out:
+    post:
+      summary: Clock Out Employee
+      description: |
+        Records employee clock-out and calculates work duration.
+        Updates weekly hours for 52-hour workweek compliance tracking.
+      operationId: clockOut
+      tags:
+        - Attendance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - location
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                location:
+                  $ref: '#/components/schemas/Location'
+      responses:
+        '200':
+          description: Successfully clocked out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/AttendanceRecord'
+                  duration:
+                    type: number
+                    description: Work session duration in minutes
+                  weekly_hours:
+                    type: number
+
+  /calculate-weekly-hours:
+    post:
+      summary: Calculate Weekly Hours
+      description: |
+        Calculates total weekly working hours for 52-hour workweek compliance.
+        Triggered automatically by database triggers but can be called manually.
+      operationId: calculateWeeklyHours
+      tags:
+        - Compliance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                week_start:
+                  type: string
+                  format: date
+                  description: Week start date (defaults to current week)
+      responses:
+        '200':
+          description: Weekly hours calculated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    format: uuid
+                  week_start:
+                    type: string
+                    format: date
+                  total_hours:
+                    type: number
+                  regular_hours:
+                    type: number
+                  overtime_hours:
+                    type: number
+                  status:
+                    type: string
+                    enum: [normal, warning, critical, blocked]
+                  compliance:
+                    type: object
+                    properties:
+                      within_limit:
+                        type: boolean
+                      hours_remaining:
+                        type: number
+                      next_warning_at:
+                        type: number
+
+  /approve-leave:
+    post:
+      summary: Approve Leave Request
+      description: |
+        Approves or rejects employee leave requests.
+        Supports Korean leave types including 출산휴가 (maternity), 배우자출산휴가 (paternity), 육아휴직 (childcare).
+      operationId: approveLeave
+      tags:
+        - Leave Management
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - request_id
+                - action
+                - approver_id
+              properties:
+                request_id:
+                  type: string
+                  format: uuid
+                action:
+                  type: string
+                  enum: [approve, reject]
+                approver_id:
+                  type: string
+                  format: uuid
+                notes:
+                  type: string
+                  maxLength: 500
+      responses:
+        '200':
+          description: Leave request processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+
+  /send-kakao-notification:
+    post:
+      summary: Send KakaoTalk Business Message
+      description: |
+        Sends business notifications via KakaoTalk Business Message API.
+        Supports 26 different message templates for various scenarios.
+      operationId: sendKakaoNotification
+      tags:
+        - Messaging
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - recipient_id
+                - template_name
+                - data
+              properties:
+                recipient_id:
+                  type: string
+                  format: uuid
+                template_name:
+                  type: string
+                  enum: 
+                    - clock_in_success
+                    - clock_out_success
+                    - overtime_warning_48h
+                    - overtime_critical_50h
+                    - overtime_blocked_52h
+                    - leave_approved
+                    - leave_rejected
+                    - payroll_ready
+                data:
+                  type: object
+                  description: Template-specific data
+      responses:
+        '200':
+          description: Message sent successfully
+
+  /sync-douzone:
+    post:
+      summary: Sync with 더존 SmartA ERP
+      description: |
+        Synchronizes attendance and payroll data with 더존 SmartA ERP system.
+        Generates Excel files in 더존 format for seamless integration.
+      operationId: syncDouzone
+      tags:
+        - ERP Integration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - organization_id
+                - sync_type
+              properties:
+                organization_id:
+                  type: string
+                  format: uuid
+                sync_type:
+                  type: string
+                  enum: [attendance, payroll, employees]
+                date_range:
+                  type: object
+                  properties:
+                    start_date:
+                      type: string
+                      format: date
+                    end_date:
+                      type: string
+                      format: date
+      responses:
+        '200':
+          description: Sync completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sync_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                  records_synced:
+                    type: integer
+                  file_url:
+                    type: string
+                    description: Download URL for generated Excel file
+
+  /generate-report:
+    post:
+      summary: Generate Reports
+      description: |
+        Generates comprehensive reports for attendance, leave, overtime, and payroll.
+        Supports Korean formatting and compliance requirements.
+      operationId: generateReport
+      tags:
+        - Reporting
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - report_type
+                - organization_id
+              properties:
+                report_type:
+                  type: string
+                  enum: [attendance, leave, overtime, payroll, compliance]
+                organization_id:
+                  type: string
+                  format: uuid
+                date_range:
+                  type: object
+                  properties:
+                    start_date:
+                      type: string
+                      format: date
+                    end_date:
+                      type: string
+                      format: date
+                filters:
+                  type: object
+                  properties:
+                    department_ids:
+                      type: array
+                      items:
+                        type: string
+                        format: uuid
+                    employee_ids:
+                      type: array
+                      items:
+                        type: string
+                        format: uuid
+                format:
+                  type: string
+                  enum: [pdf, excel, json]
+                  default: pdf
+      responses:
+        '200':
+          description: Report generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report_id:
+                    type: string
+                    format: uuid
+                  download_url:
+                    type: string
+                  expires_at:
+                    type: string
+                    format: date-time
+
+  /validate-location:
+    post:
+      summary: Validate Work Location
+      description: |
+        Validates employee location against registered work sites.
+        Supports GPS and WiFi-based verification.
+      operationId: validateLocation
+      tags:
+        - Location Services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - location
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                location:
+                  $ref: '#/components/schemas/Location'
+                wifi_info:
+                  type: object
+                  properties:
+                    ssid:
+                      type: string
+                    bssid:
+                      type: string
+      responses:
+        '200':
+          description: Location validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+                  matched_site:
+                    $ref: '#/components/schemas/WorkSite'
+                  distance:
+                    type: number
+                    description: Distance from work site in meters
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Location:
+      type: object
+      required:
+        - lat
+        - lng
+      properties:
+        lat:
+          type: number
+          minimum: -90
+          maximum: 90
+          description: Latitude coordinate
+        lng:
+          type: number
+          minimum: -180
+          maximum: 180
+          description: Longitude coordinate
+        accuracy:
+          type: number
+          minimum: 0
+          description: GPS accuracy in meters
+
+    WorkSite:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        address:
+          type: string
+        location:
+          $ref: '#/components/schemas/Location'
+        radius:
+          type: number
+          description: Geofence radius in meters
+        wifi_networks:
+          type: array
+          items:
+            type: string
+
+    AttendanceRecord:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [clock_in, clock_out, break_start, break_end]
+        timestamp:
+          type: string
+          format: date-time
+        location:
+          $ref: '#/components/schemas/Location'
+        verified:
+          type: boolean
+        duration:
+          type: number
+          description: Session duration in minutes (for clock_out records)
+
+    LeaveRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        employee_id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: 
+            - annual      # 연차
+            - sick        # 병가
+            - personal    # 개인휴가
+            - maternity   # 출산휴가 (100일)
+            - paternity   # 배우자출산휴가 (20일)
+            - childcare   # 육아휴직 (18개월)
+            - other
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        days_requested:
+          type: number
+        reason:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected, cancelled]
+        approved_by:
+          type: string
+          format: uuid
+        approved_at:
+          type: string
+          format: date-time
+        notes:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+        details:
+          type: object
+          description: Additional error details
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Authorization required"
+            code: "UNAUTHORIZED"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    TooManyRequests:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying
+          schema:
+            type: integer
+        X-RateLimit-Limit:
+          description: Rate limit ceiling
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          description: Requests remaining
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+tags:
+  - name: Attendance
+    description: Employee attendance tracking and clock-in/out operations
+  - name: Compliance
+    description: Korean labor law compliance and 52-hour workweek monitoring
+  - name: Leave Management
+    description: Leave requests and approval workflows
+  - name: Messaging
+    description: KakaoTalk business messaging integration
+  - name: ERP Integration
+    description: Integration with Korean ERP systems (더존, SAP, 영림원)
+  - name: Reporting
+    description: Report generation and analytics
+  - name: Location Services
+    description: GPS and WiFi-based location verification
