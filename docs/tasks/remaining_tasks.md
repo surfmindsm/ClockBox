@@ -6,7 +6,9 @@
 - ✅ 기초 프로젝트 구조 설정 완료
 - ✅ 데이터베이스 스키마 설계 완료
 - ✅ 기본 인증 플로우 구현
-- 🔄 컴포넌트 개발 진행 필요
+- ✅ 52시간 근무제 기능 100% 완료
+- ✅ Frontend 핵심 페이지 80% 구현
+- 🔄 Mobile App 추가 화면 개발 필요
 - 📝 외부 서비스 연동 대기
 
 ---
@@ -77,9 +79,10 @@
 
 ### 2.3 Backend (Supabase Edge Functions)
 
-- [ ] `functions/clock-out/` - 퇴근 처리
-- [ ] `functions/approve-leave/` - 휴가 승인
-- [ ] `functions/calculate-weekly-hours/` - 주간 근무시간 계산
+- [x] `functions/clock-in/` - 출근 처리 ✅ (2024-12-28)
+- [x] `functions/clock-out/` - 퇴근 처리 ✅ (2024-12-29)
+- [x] `functions/approve-leave/` - 휴가 승인 ✅ (2024-12-29)
+- [x] `functions/calculate-weekly-hours/` - 주간 근무시간 계산 ✅ (2024-12-29)
 - [ ] `functions/send-kakao-notification/` - 카카오톡 알림
 - [ ] `functions/sync-douzone/` - 더존 연동
 - [ ] `functions/generate-report/` - 리포트 생성
@@ -204,29 +207,29 @@
 | Supabase 설정 | 5 | 5 | 100% |
 | Frontend 개발 | 25 | 20 | 80% |
 | Mobile 개발 | 13 | 4 | 31% |
-| Backend Functions | 6 | 2 | 33% |
+| Backend Functions | 7 | 4 | 57% |
 | 외부 서비스 | 13 | 0 | 0% |
 | 테스트 | 10 | 1 | 10% |
 | UI/UX | 10 | 0 | 0% |
 | 인프라 | 9 | 0 | 0% |
 | 문서화 | 8 | 5 | 63% |
-| **전체** | **103** | **41** | **40%** |
+| **전체** | **104** | **43** | **41%** |
 
 ---
 
 ## 🚀 다음 스프린트 (2주)
 
 ### Week 1 (1월 1주차)
-1. Supabase Cloud 프로젝트 설정 및 마이그레이션
-2. Frontend 핵심 컴포넌트 5개 개발
-3. Mobile 로그인/홈 화면 구현
-4. 52시간 근무제 로직 완성
+1. ✅ Mobile App 나머지 화면 구현 (출퇴근, 휴가, 일정)
+2. Backend Edge Functions 나머지 구현
+3. 카카오톡 알림톡 연동 시작
+4. 단위 테스트 케이스 추가
 
 ### Week 2 (1월 2주차)
-1. 출퇴근 전체 플로우 구현
-2. 휴가 신청/승인 시스템 구현
-3. 카카오톡 알림톡 연동
-4. 기본 테스트 케이스 작성
+1. ERP 시스템 연동 (더존, 영림원)
+2. 성능 최적화 및 부하 테스트
+3. UI/UX 개선 (디자인 시스템)
+4. 배포 파이프라인 구성
 
 ---
 
@@ -294,9 +297,13 @@
 
 ### Backend 개발
 - ✅ RLS 정책 테스트 구현 (사용자/조직/출퇴근 데이터 격리 검증)
+- ✅ clock-out 함수 구현 (퇴근 처리)
+- ✅ approve-leave 함수 구현 (휴가 승인)
+- ✅ calculate-weekly-hours 함수 구현 (주간 근무시간 계산)
 
 ### 진행률
-- 전체 진행률: 27% → 40% (13% 상승)
+- 전체 진행률: 27% → 41% (14% 상승)
 - Frontend 개발: 56% → 80% (24% 상승)
 - Mobile 개발: 8% → 31% (23% 상승)
+- Backend Functions: 33% → 57% (24% 상승)
 - 52시간 근무제: 0% → 100% (100% 완료)
