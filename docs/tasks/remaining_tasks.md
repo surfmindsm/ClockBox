@@ -1,6 +1,6 @@
 # ClockBox 개발 잔여 작업 목록
 
-## 📅 작성일: 2024-12-28 (최종 업데이트: 2024-12-29)
+## 📅 작성일: 2024-12-28 (최종 업데이트: 2024-12-30)
 
 ## 🎯 프로젝트 현황
 - ✅ 기초 프로젝트 구조 설정 완료
@@ -84,8 +84,8 @@
 - [x] `functions/approve-leave/` - 휴가 승인 ✅ (2024-12-29)
 - [x] `functions/calculate-weekly-hours/` - 주간 근무시간 계산 ✅ (2024-12-29)
 - [x] `functions/send-kakao-notification/` - 카카오톡 알림 ✅ (2024-12-29)
-- [x] `functions/sync-douzone/` - 더존 연동 ✅ (2024-12-29)
-- [x] `functions/generate-report/` - 리포트 생성 ✅ (2024-12-29)
+- [x] `functions/sync-douzone/` - 더존 연동 ✅ (2024-12-30)
+- [x] `functions/generate-report/` - 리포트 생성 ✅ (2024-12-30)
 
 ---
 
@@ -222,16 +222,16 @@
 ## 🚀 다음 스프린트 (2주)
 
 ### Week 1 (1월 1주차)
-1. Mobile App 나머지 화면 구현 (출퇴근, 휴가, 일정)
-2. Backend Edge Functions 나머지 구현 (sync-douzone, generate-report)
-3. 카카오톡 알림톡 연동 시작 (비즈니스 채널 생성)
-4. 단위 테스트 케이스 추가 (휴가, 급여 계산)
+1. 카카오톡 알림톡 연동 시작 (비즈니스 채널 생성)
+2. 단위 테스트 케이스 추가 (휴가, 급여 계산)
+3. ERP 시스템 연동 (더존 SmartA, 영림원 K-System)
+4. 성능 테스트 및 최적화
 
 ### Week 2 (1월 2주차)
-1. ERP 시스템 연동 (더존, 영림원)
-2. 성능 최적화 및 부하 테스트
-3. UI/UX 개선 (디자인 시스템)
-4. 배포 파이프라인 구성
+1. UI/UX 개선 (디자인 시스템, 다크 모드)
+2. 접근성 개선 (ARIA 레이블, 키보드 네비게이션)
+3. 다국어 지원 (i18n 설정)
+4. CI/CD 파이프라인 구성
 
 ---
 
@@ -254,7 +254,7 @@
 
 ---
 
-*마지막 업데이트: 2024-12-29 (진행률 55% 달성 - Mobile & Backend 100% 완료!)*
+*마지막 업데이트: 2024-12-30 (진행률 55% 달성 - Mobile & Backend 100% 완료!)*
 
 ## 📌 최근 완료 작업 (2024-12-29)
 ### 52시간 근무제 완성
@@ -285,9 +285,10 @@
 - ✅ 위치 서비스 구현 (location.ts)
 - ✅ 푸시 알림 서비스 구현 (notification.ts)
 
-### Backend Edge Functions 개발
+### Backend Edge Functions 완료 (2024-12-30)
 - ✅ sync-douzone 함수 구현 (더존 ERP 연동)
 - ✅ generate-report 함수 구현 (리포트 생성)
+- ✅ 모든 Backend Edge Functions 100% 구현 완료
 
 ## 📌 이전 완료 작업 (2024-12-28)
 ### 인프라 설정
