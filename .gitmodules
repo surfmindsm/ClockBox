@@ -7,3 +7,6 @@
 [submodule "app"]
 	path = app
 	url = https://github.com/surfmindsm/clockbox-app.git
+[submodule "app2"]
+	path = app2
+	url = https://github.com/surfmindsm/clockbox-app2.git
