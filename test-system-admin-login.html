@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test System Admin Role Detection</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>System Admin Role Detection Test</h1>
+    <div id="status">Testing...</div>
+    <div id="results"></div>
+    
+    <script>
+        const supabaseUrl = 'https://apmgoboqnodhroqvetjx.supabase.co'
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwbWdvYm9xbm9kaHJvcXZldGp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzNzk3ODYsImV4cCI6MjA3MTk1NTc4Nn0.ZBVePeC3wDsTQLckCb8yLA7EEdhKjN-zUva9qJzAm4I'
+        
+        const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey)
+        
+        async function testSystemAdminLogin() {
+            const statusDiv = document.getElementById('status')
+            const resultsDiv = document.getElementById('results')
+            
+            try {
+                // Test system admin account: system@clockbox.dev / System123!
+                statusDiv.innerHTML = 'Logging in as system admin...'
+                
+                const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+                    email: 'system@clockbox.dev',
+                    password: 'System123!'
+                })
+                
+                if (loginError) {
+                    resultsDiv.innerHTML = `<p style="color:red">Login failed: ${loginError.message}</p>`
+                    return
+                }
+                
+                statusDiv.innerHTML = 'Login successful! Fetching user role...'
+                
+                // Get current user
+                const { data: { user } } = await supabase.auth.getUser()
+                console.log('User:', user)
+                
+                // Try to fetch employee data (this should work now with fixed RLS)
+                const { data: employee, error: employeeError } = await supabase
+                    .from('employees')
+                    .select('user_role, company_id, department, position')
+                    .eq('profile_id', user.id)
+                    .single()
+                
+                if (employeeError) {
+                    resultsDiv.innerHTML = `<p style="color:red">RLS Error (should be fixed): ${employeeError.message}</p>`
+                    console.error('Employee fetch error:', employeeError)
+                    return
+                }
+                
+                // Role mapping
+                const roleMapping = {
+                    'admin': 'system_admin',
+                    'manager': 'company_admin', 
+                    'employee': 'employee',
+                    'system_admin': 'system_admin'
+                }
+                
+                const mappedRole = roleMapping[employee.user_role] || 'employee'
+                
+                resultsDiv.innerHTML = `
+                    <div style="color:green">
+                        <h2>✅ Success! RLS Fixed</h2>
+                        <p><strong>User ID:</strong> ${user.id}</p>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>Raw DB Role:</strong> ${employee.user_role}</p>
+                        <p><strong>Mapped Role:</strong> ${mappedRole}</p>
+                        <p><strong>Company ID:</strong> ${employee.company_id}</p>
+                        <p><strong>Department:</strong> ${employee.department}</p>
+                        <p><strong>Position:</strong> ${employee.position}</p>
+                        
+                        ${mappedRole === 'system_admin' ? 
+                            '<p style="background:green;color:white;padding:10px;"><strong>🎉 SYSTEM ADMIN ACCESS CONFIRMED!</strong></p>' : 
+                            '<p style="background:red;color:white;padding:10px;"><strong>❌ Role mapping issue - should be system_admin</strong></p>'
+                        }
+                    </div>
+                `
+                
+                statusDiv.innerHTML = 'Test completed!'
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color:red">Unexpected error: ${error.message}</p>`
+                console.error('Test error:', error)
+            }
+        }
+        
+        // Run test on page load
+        testSystemAdminLogin()
+    </script>
+</body>
+</html>
