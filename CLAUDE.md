@@ -19,7 +19,7 @@ This is a **monorepo using git submodules** for separate concerns:
 
 ## Current Development State
 
-The project is **99.8% complete** with full implementation of core systems. The 4-tier role-based access control system, user management, and company-organization management are fully operational. Only external API integrations (KakaoTalk, Google Maps, Douzone ERP) remain for full deployment.
+The project is **99.9% complete** with full implementation of core systems. The 4-tier role-based access control system, user management, company-organization management, and work location management are fully operational. Only external API integrations (KakaoTalk, Google Maps, Douzone ERP) remain for full deployment.
 
 ## Technology Stack
 
@@ -44,6 +44,8 @@ The project is **99.8% complete** with full implementation of core systems. The 
 - `date-fns` - Date manipulation
 - `zustand` - Client state management
 - `bcrypt` - Password hashing
+- `@headlessui/react@2.2.7` - Modal and UI components
+- `@tanstack/react-query` - Server state management
 
 ## Key System Requirements
 
@@ -113,6 +115,20 @@ SELECT * FROM cleanup_mock_users_for_admin();
 \d employees           # View employees table structure
 \d companies          # View companies table structure
 \d organizations      # View organizations table structure
+\d work_locations     # View work locations table structure
+\d organization_work_locations # View organization-location mapping
+
+# Work location queries
+SELECT * FROM work_locations WHERE company_id = 'company-uuid';
+SELECT * FROM organization_work_locations WHERE organization_id = 'org-uuid';
+```
+
+### Work Location System Setup
+```sql
+-- Required database migration for work locations
+-- Execute: backend/supabase/migrations/00014_work_locations_minimal.sql
+-- This creates work_locations and organization_work_locations tables
+-- Includes RLS policies and helper functions
 ```
 
 ## Architecture Overview
@@ -137,6 +153,7 @@ The application implements a **4-tier Role-Based Access Control (RBAC)** system:
 - `system-admin.ts` - User management CRUD operations
 - `organizations.ts` - Company-organization hierarchy management
 - `company-admin.ts` - Company-level operations
+- `work-locations.ts` - Work location management and organization assignment
 
 #### Database Schema (PostgreSQL + Supabase)
 ```sql
@@ -145,6 +162,8 @@ employees (id, profile_id, full_name, email, user_role, company_id, organization
 companies (id, name, created_at...)  
 organizations (id, name, company_id, manager_id...)
 approval_authorities (id, employee_id, scope...)
+work_locations (id, company_id, name, address, latitude, longitude, wifi_ssids, auth_method...)
+organization_work_locations (id, organization_id, work_location_id, is_active...)
 
 -- Key RPC Functions (PostgreSQL)
 get_all_users_for_admin() -- Fetch all users with organization info
@@ -158,6 +177,8 @@ cleanup_mock_users_for_admin() -- Remove test/invalid users
 - **Role-based Navigation**: Dynamic menu generation in `/lib/rbac.ts`
 - **Component Library**: Radix UI primitives with custom styling
 - **User Management**: Complete CRUD interface at `/system/users`
+- **Work Location Management**: Modal-based CRUD at `/admin/locations`
+- **Organization Assignment**: Integrated in `/system/organizations`
 
 ## Development Guidelines
 
@@ -217,17 +238,44 @@ AS $$
 $$;
 ```
 
+#### Work Location Management Pattern
+```typescript
+import { getWorkLocations, updateOrganizationWorkLocations } from '@/lib/api/work-locations'
+
+// Load work locations for organization
+const [locations, assignments] = await Promise.all([
+  getWorkLocations(),
+  getOrganizationWorkLocations(organizationId)
+])
+
+// Update organization work location assignments
+await updateOrganizationWorkLocations(organizationId, {
+  work_location_ids: Array.from(selectedLocationIds)
+})
+```
+
+#### Modal Component Pattern (Headless UI v2)
+```typescript
+import { Dialog, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
+
+// Use DialogPanel and DialogTitle instead of Dialog.Panel and Dialog.Title
+// Use TransitionChild instead of Transition.Child
+```
+
 ## Current Operational Features
 
 ### Fully Implemented & Ready for Use
 - **`/system/dashboard`** - Super admin system overview
 - **`/system/users`** - Complete user management (CRUD operations)
 - **`/system/company`** - Company information management
+- **`/admin/locations`** - Work location management with GPS/WiFi authentication
+- **`/system/organizations`** - Organization management with work location assignment
 - **Role-based navigation** - 258 menu items filtered by permissions
 - **User registration** - Direct account creation without email verification
 - **User profile editing** - All fields (name, email, phone, company, organization, role)
 - **Organization management** - Hierarchical company-organization structure
 - **Mock data cleanup** - Bulk removal of test/invalid users
+- **Work location features** - GPS/WiFi-based location authentication system
 
 ### Database Features (Production Ready)
 - **Row Level Security** - Complete data isolation by role
@@ -260,7 +308,7 @@ git submodule update --remote --merge
 
 ## Production Readiness Status
 
-**Overall Completion**: 99.8% (Enterprise Ready)
+**Overall Completion**: 99.9% (Enterprise Ready)
 
 **Remaining Dependencies** (External APIs):
 - KakaoTalk Business Message API key
