@@ -9,8 +9,9 @@ ClockBox is a comprehensive workforce and attendance management system designed 
 ## Repository Structure
 
 This is a **monorepo using git submodules** for separate concerns:
-- `app/` - Mobile application (submodule: clockbox-app)
-- `backend/` - Backend services (submodule: clockbox-backend)  
+- `app/` - React Native mobile application (Expo-based)
+- `app2/` - Flutter mobile application for Korean market (native performance)
+- `backend/` - Backend services (Supabase Edge Functions + PostgreSQL)
 - `frontend/` - Web frontend (Next.js 15 + TypeScript + Tailwind CSS)
 - `docs/` - Project documentation and PRDs in Korean
   - `prd/` - Detailed product requirement documents for each feature module
@@ -46,6 +47,23 @@ The project is **99.9% complete** with full implementation of core systems. The 
 - `bcrypt` - Password hashing
 - `@headlessui/react@2.2.7` - Modal and UI components
 - `@tanstack/react-query` - Server state management
+
+### Mobile App Technologies
+#### React Native (app/)
+- **Expo SDK 53** - Development platform and build system
+- **React Navigation 7** - Navigation and routing
+- **Supabase Flutter 2.3** - Backend integration
+- **Expo Location 18** - GPS and geofencing
+- **Expo Local Authentication 16** - Biometric authentication
+
+#### Flutter (app2/)
+- **Flutter 3.2+** - UI framework optimized for Korean market
+- **Riverpod 2.4** - State management
+- **Go Router 12** - Navigation
+- **Supabase Flutter 2.3** - Backend integration
+- **Geolocator 10** - Location services
+- **Local Auth 2.1** - Biometric authentication
+- **NotoSans KR** - Korean typography
 
 ## Key System Requirements
 
@@ -102,6 +120,66 @@ npm start
 # Type checking and linting
 npx tsc --noEmit       # Type checking only
 npm run lint           # ESLint checking
+```
+
+### Mobile App Development
+
+#### React Native (app/)
+```bash
+cd app
+
+# Start Expo development server
+npm start              # Starts Expo Metro bundler
+
+# Run on specific platforms
+npm run android        # Android emulator/device
+npm run ios           # iOS simulator/device
+npm run web           # Web browser
+```
+
+#### Flutter (app2/)
+```bash
+cd app2
+
+# Get dependencies
+flutter pub get
+
+# Run on development
+flutter run           # Default device
+flutter run -d chrome # Web browser
+flutter run -d android # Android emulator/device
+
+# Build for production
+flutter build apk     # Android APK
+flutter build ios     # iOS build
+flutter build web     # Web build
+```
+
+### Backend Development (Supabase)
+```bash
+cd backend
+
+# Development server
+npm run dev           # Serve Edge Functions locally
+
+# Database operations
+npm run db:migrate    # Apply migrations
+npm run db:reset      # Reset database
+npm run db:seed       # Reset with seed data
+
+# Testing
+npm test             # Run all tests
+npm run test:rls     # Test Row Level Security policies
+npm run test:sql     # Test SQL directly
+npm run test:integration # Integration tests
+
+# Functions
+npm run functions:serve   # Serve functions locally
+npm run functions:deploy  # Deploy to staging
+npm run deploy           # Deploy to production
+
+# Type checking
+npm run type-check   # TypeScript validation
 ```
 
 ### Database Operations (Supabase)
