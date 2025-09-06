@@ -189,16 +189,38 @@ SELECT * FROM get_all_users_for_admin();
 SELECT * FROM get_user_details_for_admin('user-uuid-here');
 SELECT * FROM cleanup_mock_users_for_admin();
 
+# Organization Manager functions ✨
+SELECT * FROM get_organization_managers_for_admin();
+SELECT * FROM get_organization_managers_for_admin('org-uuid-here');
+SELECT * FROM get_manager_candidates_for_admin('org-uuid-here');
+SELECT * FROM get_approval_hierarchy('org-uuid-here');
+
 # Database schema inspection
 \d employees           # View employees table structure
 \d companies          # View companies table structure
 \d organizations      # View organizations table structure
+\d organization_managers # View organization managers table structure ✨
 \d work_locations     # View work locations table structure
 \d organization_work_locations # View organization-location mapping
 
 # Work location queries
 SELECT * FROM work_locations WHERE company_id = 'company-uuid';
 SELECT * FROM organization_work_locations WHERE organization_id = 'org-uuid';
+
+# Organization manager queries ✨
+SELECT * FROM organization_managers WHERE organization_id = 'org-uuid';
+SELECT * FROM organization_managers WHERE is_primary_manager = true;
+```
+
+### Organization Manager System Setup ✨
+```sql
+-- Step 1: Create organization_managers table
+-- Execute: scripts/create-organization-managers-table-final.sql
+-- This creates the organization_managers table with constraints and indexes
+
+-- Step 2: Fix RLS policies (prevents infinite recursion)
+-- Execute: scripts/fix-organization-managers-rls.sql  
+-- This sets up secure RLS policies and RPC functions
 ```
 
 ### Work Location System Setup
@@ -232,6 +254,7 @@ The application implements a **4-tier Role-Based Access Control (RBAC)** system:
 - `organizations.ts` - Company-organization hierarchy management
 - `company-admin.ts` - Company-level operations
 - `work-locations.ts` - Work location management and organization assignment
+- `organization-manager.ts` - Organization manager system (조직장 관리) ✨
 
 #### Database Schema (PostgreSQL + Supabase)
 ```sql
@@ -239,6 +262,7 @@ The application implements a **4-tier Role-Based Access Control (RBAC)** system:
 employees (id, profile_id, full_name, email, user_role, company_id, organization_id...)
 companies (id, name, created_at...)  
 organizations (id, name, company_id, manager_id...)
+organization_managers (id, organization_id, employee_id, is_primary_manager, assigned_by...) -- 조직장 관리 ✨
 approval_authorities (id, employee_id, scope...)
 work_locations (id, company_id, name, address, latitude, longitude, wifi_ssids, auth_method...)
 organization_work_locations (id, organization_id, work_location_id, is_active...)
@@ -248,6 +272,12 @@ get_all_users_for_admin() -- Fetch all users with organization info
 get_user_details_for_admin(user_id) -- Detailed user information
 update_user_for_admin(user_id, updates) -- Update user bypassing RLS
 cleanup_mock_users_for_admin() -- Remove test/invalid users
+-- Organization Manager Functions ✨
+get_organization_managers_for_admin(org_id) -- Fetch organization managers
+assign_organization_manager_for_admin(org_id, emp_id, is_primary) -- Assign manager
+remove_organization_manager_for_admin(manager_id) -- Remove manager
+get_approval_hierarchy(org_id) -- Get hierarchical approval structure
+get_manager_candidates_for_admin(org_id) -- Get manager candidates
 ```
 
 ### UI Component Structure
@@ -257,6 +287,7 @@ cleanup_mock_users_for_admin() -- Remove test/invalid users
 - **User Management**: Complete CRUD interface at `/system/users`
 - **Work Location Management**: Modal-based CRUD at `/admin/locations`
 - **Organization Assignment**: Integrated in `/system/organizations`
+- **Organization Manager System**: 2-step selection UI at `/system/organization-managers` ✨
 
 ## Development Guidelines
 
@@ -332,6 +363,20 @@ await updateOrganizationWorkLocations(organizationId, {
 })
 ```
 
+#### Organization Manager Management Pattern ✨
+```typescript
+import { getOrganizationManagers, assignOrganizationManager } from '@/lib/api/organization-manager'
+
+// Load organization managers for specific organization
+const managers = await getOrganizationManagers(organizationId)
+
+// Assign organization manager (with primary designation)
+await assignOrganizationManager(organizationId, employeeId, true)
+
+// Get hierarchical approval structure for organization
+const hierarchy = await getApprovalHierarchy(organizationId)
+```
+
 #### Modal Component Pattern (Headless UI v2)
 ```typescript
 import { Dialog, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
@@ -348,12 +393,14 @@ import { Dialog, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/r
 - **`/system/company`** - Company information management
 - **`/admin/locations`** - Work location management with GPS/WiFi authentication
 - **`/system/organizations`** - Organization management with work location assignment
+- **`/system/organization-managers`** - Organization manager system (조직장 관리) ✨
 - **Role-based navigation** - 258 menu items filtered by permissions
 - **User registration** - Direct account creation without email verification
 - **User profile editing** - All fields (name, email, phone, company, organization, role)
 - **Organization management** - Hierarchical company-organization structure
 - **Mock data cleanup** - Bulk removal of test/invalid users
 - **Work location features** - GPS/WiFi-based location authentication system
+- **Organization manager features** - Hierarchical approval structure and n-tier manager assignment ✨
 
 ### Database Features (Production Ready)
 - **Row Level Security** - Complete data isolation by role
